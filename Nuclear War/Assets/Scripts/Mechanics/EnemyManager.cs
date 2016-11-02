@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EnemyManager : CharactersManager {
+public class EnemyManager : MechanicsManager {
+
+    public int[] yPos = new int[4];
 
     //Singleton
     public static EnemyManager instance = null;
@@ -16,14 +18,10 @@ public class EnemyManager : CharactersManager {
             Destroy (gameObject);
         }
         //EndOfSingleton
-
-        //Initialing variable. The "instance." is used to say we're referring to this object instead of the CharactersManager class.
-        instance.energyTime = 1;
-
     }
 
+
     void Update () {
-        EnergyPlayer (1, 1);
 
     }
 }

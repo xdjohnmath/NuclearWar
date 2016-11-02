@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerManager : CharactersManager {
-    
+public class PlayerManager : MechanicsManager {
+
     //Singleton
     public static PlayerManager instance = null;
 
@@ -17,11 +17,10 @@ public class PlayerManager : CharactersManager {
         }
         //EndOfSingleton
 
-        //Initialing variable. The "instance." is used to say we're referring to this object instead of the CharactersManager class.
-        instance.energyTime = 1;
+      
     }
 
     void Update () {
-        EnergyPlayer (1, 2);
     }
+
 }
