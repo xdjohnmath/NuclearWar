@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-[System.Serializable]
 
 
 //O Script tá comentado em ingles e portugues... I'm not even sorry ;) That's how I roll.. Get uset to it
@@ -17,15 +16,12 @@ public class CharactersManager : MechanicsManager {
     RaycastHit2D rc;
     public GameObject shot;
 
-   [HideInInspector]
     public direction dir;
     public GoodOrEvil goodOrEvil;
     public creatureAttackType type;
-    //[HideInInspector] - João, depois que tu acertar todos os valores, tu tira o comment
     public Vector2 startingPos, endingPos;
 
-    [HideInInspector]
-    public bool isAttacking, beingAttacked;
+    public bool isAttacking, beingAttacked, move;
     public int creatureCost, creatureLife, creatureAttack, creatureIniciative, creatureAttackRange;
     public float creatureSpeed, pushedBackForce, shotSpeed;
 
@@ -53,7 +49,7 @@ public class CharactersManager : MechanicsManager {
 
     //Muda o nome do game object pro nome da criatura
     public void SettingName () {
-        this.name = creatureName;
+        creatureName = this.name;
     }
 
     //Detecta as colisões e se deve atacar ou ser atacado
@@ -67,27 +63,24 @@ public class CharactersManager : MechanicsManager {
 
         //Se for organela e o raycast não tiver pegando em nada, fica azul
         if (rc.collider == null && this.goodOrEvil == GoodOrEvil.organel) {
+            move = true;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
-        //Se for virus e o raycast não tiver pegando em nada, fica cyano
-        else if (rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
-            Debug.DrawLine (this.transform.position, raycastPos.position, Color.cyan);
+        if (rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
+            move = true;
+            Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
         //Se o raycast achou um collider e este objeto tá atacando, ele diz quem ataca e muda a cor da linha
-        if (rc.collider != null && Attacking()) {
+        if (rc.collider != null && this.goodOrEvil != rc.collider.GetComponent<CharactersManager> ().goodOrEvil) {
+            Attacking ();
+            rc.collider.GetComponent<CharactersManager> ().BeingAttacked ();
             print (rc.collider.GetComponent<CharactersManager> ().name + " atacou " + this.name);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
             //Esse cara ataca
         }
 
-        //Se o raycast achou um collider e este objeto tá sendo atacado, ele diz quem tá atacando e muda a cor da linha
-        else if (rc.collider != null && BeingAttacked()) {
-            print (this.name + " foi atacado por " + rc.collider.GetComponent<CharactersManager> ().name);
-            Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
-            //Esse cara foi atacado
-        }
     }
 
     //Default values according to different creature attack type - If game designer doesn't type in an specific value;
@@ -101,7 +94,7 @@ public class CharactersManager : MechanicsManager {
                 creatureAttackRange = 7;
                 break;
                 case creatureAttackType.HighRange:
-                creatureAttackRange = 20;
+                creatureAttackRange = 10;
                 break;
             }
         }
@@ -116,34 +109,34 @@ public class CharactersManager : MechanicsManager {
     }
 
     //Attacking method. Returns true if it's attacking
-    public bool Attacking () {
-
-        //Check who has the iniciative, the one whom have it in a bigger value attacks
-        if (this.creatureIniciative >= rc.collider.GetComponent<CharactersManager>().creatureIniciative) {
-            print (rc.collider.GetComponent<CharactersManager> ().name + " tem " + rc.collider.GetComponent<CharactersManager> ().creatureLife + " de vida");
-            //this variable tells if this character moves or not after attack
-            this.isAttacking = true;
-            if (this.type == creatureAttackType.LowRange) {
-                //Aqui a gente passa a condição de chamar a animação de lowRange
-            }
-            else if (this.type == creatureAttackType.HighRange) {
-                //Aqui a gente passa a condição de chamar a animação de HighRange
-            }
-            //Call Animation - Each different character calls a Different attack in the animation
-            return true;
-        }
-        else {
-            //false so it's no longer attacking
-            this.isAttacking = false;
-            return false;
+    public void Attacking () {
+        move = false;
+        switch (this.type) {
+            case creatureAttackType.LowRange:
+                if (this.creatureIniciative > rc.collider.GetComponent<CharactersManager> ().creatureIniciative) {
+                    this.isAttacking = true;
+                    rc.collider.GetComponent<CharactersManager> ().beingAttacked = true;
+                }
+                else if (this.creatureIniciative == rc.collider.GetComponent<CharactersManager> ().creatureIniciative && this.goodOrEvil == GoodOrEvil.organel) {
+                    this.isAttacking = true;
+                    rc.collider.GetComponent<CharactersManager> ().beingAttacked = true;
+                }
+                else if (this.creatureIniciative < rc.collider.GetComponent<CharactersManager> ().creatureIniciative) {
+                    this.beingAttacked = true;
+                    rc.collider.GetComponent<CharactersManager> ().isAttacking = true;
+                }
+            break;
+            case creatureAttackType.HighRange:
+                this.isAttacking = true;
+                rc.collider.GetComponent<CharactersManager> ().beingAttacked = true;
+            break;
         }
     }
 
     //BeingAttacking method. Returns true if it's being attacked
     public bool BeingAttacked () {
-        if (rc.collider.GetComponent<CharactersManager>().creatureIniciative > this.creatureIniciative) {
-            //this variavle will help in the animations, if not, just delete it
-            this.beingAttacked = true;
+        move = false;
+        if (this.beingAttacked == true) {
             //Call Animation
             PushedBack ();
             return true;
@@ -157,8 +150,8 @@ public class CharactersManager : MechanicsManager {
 
     //If the pushes back force it's different than 0, it pushes it back 
     public void PushedBack () {
-        if (pushedBackForce != 0) {
-            transform.Translate (Vector2.right * pushedBackForce / 2f * (int)this.dir * -1f);
+        if (this.pushedBackForce != 0) {
+            transform.Translate (Vector2.right * this.pushedBackForce / 2f * (int)this.dir * -1f);
         }
     }
 
@@ -175,6 +168,10 @@ public class CharactersManager : MechanicsManager {
 
     }
 
+    public void TankAttack () {
+
+    }
+
     public void ShotHighRangeProperties () {
         shot.gameObject.GetComponent<ShotsManager> ().shotSpeed = this.shotSpeed;
         shot.gameObject.GetComponent<ShotsManager> ().shotAttack = this.creatureAttack;
@@ -188,10 +185,6 @@ public class CharactersManager : MechanicsManager {
         //Checks rayCast
         RayCastingMethod ();
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
-            Instantiate (shot, this.gameObject.transform.position, Quaternion.identity); 
-
-        }
     }
 
     //If this caracter is an organel, he's gonna have different properties than the virus. The direction they move it's an example
@@ -210,8 +203,8 @@ public class CharactersManager : MechanicsManager {
 
     //Tell them to move if they're not attacking
     public void Movement () {
-        if (this.isAttacking == false || this.beingAttacked) {
-            transform.Translate (Vector2.right * creatureSpeed/10f * (int) this.dir);
+        if (move) {
+            transform.Translate (Vector2.right * creatureSpeed / 10f * (int)this.dir);
         }
     }
 

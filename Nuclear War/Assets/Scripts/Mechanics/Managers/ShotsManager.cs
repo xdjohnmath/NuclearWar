@@ -15,7 +15,7 @@ public class ShotsManager : MonoBehaviour {
 	}
 
     void OnCollisionEnter2D (Collision2D other) {
-        if (other.gameObject.GetComponent<CharactersManager>().goodOrEvil == GoodOrEvil.virus) {
+        if (other.gameObject.GetComponent<CharactersManager> ().goodOrEvil == GoodOrEvil.virus) {
             other.gameObject.GetComponent<CharactersManager> ().creatureLife -= shotAttack;
             Destroy (this.gameObject);
         }
