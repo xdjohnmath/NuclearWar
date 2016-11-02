@@ -37,7 +37,7 @@ public class CharactersManager : MechanicsManager {
     }
 
     public void RayCastingMethod () {
-        RaycastHit2D rc = Physics2D.Raycast (transform.position, raycastPos.position);
+        RaycastHit2D rc = Physics2D.Linecast (transform.position, raycastPos.position);
 
         if (rc.collider == null) {
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
