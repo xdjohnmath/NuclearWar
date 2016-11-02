@@ -12,8 +12,9 @@ public class CharactersManager : MechanicsManager {
     //Variables
     public string creatureName, creatureSpecialAttack;
     Transform raycastPos;
+    RaycastHit2D rc;
 
-    [HideInInspector]
+   [HideInInspector]
     public direction dir;
     public GoodOrEvil goodOrEvil;
     public creatureAttackType type;
@@ -27,7 +28,7 @@ public class CharactersManager : MechanicsManager {
 
     void Start () {
         raycastPos = this.gameObject.transform.GetChild (0);
-       // SettingName ();
+        SettingName ();
         SettingGoodOrEvilType ();
         SettingRayCastSize ();
     }
@@ -37,18 +38,19 @@ public class CharactersManager : MechanicsManager {
     }
 
     public void RayCastingMethod () {
-        RaycastHit2D rc = Physics2D.Linecast (transform.position, raycastPos.position);
+        rc = Physics2D.Linecast (transform.position, raycastPos.position);
 
         if (rc.collider == null) {
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
         else {
-            Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
+            Debug.DrawLine (this.transform.position, raycastPos.position, Color.grey);
             Debug.Log (rc.collider.name);
         }
 
           if (rc.collider != null && this.creatureIniciative > rc.collider.GetComponent<CharactersManager> ().creatureIniciative) {
             print (rc.collider.GetComponent<CharactersManager> ().name + " foi atacado por " + this.name);
+            Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
             //Esse cara ataca
         }
     }
@@ -70,6 +72,20 @@ public class CharactersManager : MechanicsManager {
         raycastPos.position = new Vector2 (this.transform.position.x + creatureAttackRange, this.transform.position.y);
     }
 
+    public void SettingIniciative () {
+        if (this.creatureIniciative >= rc.collider.GetComponent<CharactersManager>().creatureIniciative) {
+            this.isAttacking = true;
+            //attack effect will be done by animation
+        }
+    }
+
+    public void LowRangeAttack () {
+        rc.collider.GetComponent<CharactersManager> ().creatureLife -= this.creatureAttack;
+    }
+
+    public void HighRangeAttack () {
+        //instantiate the projectiles - After they collide, subtract life; Animation;
+    }
 
     void Update () {
         Movement ();
