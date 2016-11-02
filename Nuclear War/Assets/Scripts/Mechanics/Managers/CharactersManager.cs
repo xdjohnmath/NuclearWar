@@ -15,6 +15,7 @@ public class CharactersManager : MechanicsManager {
     public string creatureName, creatureSpecialAttack;
     Transform raycastPos;
     RaycastHit2D rc;
+    public GameObject shot;
 
    [HideInInspector]
     public direction dir;
@@ -26,13 +27,28 @@ public class CharactersManager : MechanicsManager {
     [HideInInspector]
     public bool isAttacking, beingAttacked;
     public int creatureCost, creatureLife, creatureAttack, creatureIniciative, creatureAttackRange;
-    public float creatureSpeed, pushedBackForce;
+    public float creatureSpeed, pushedBackForce, shotSpeed;
 
     void Start () {
         //pega o transform do objeto filho
         raycastPos = this.gameObject.transform.GetChild (0);
         SettingName ();
         SettingGoodOrEvilType ();
+        SettingTypeCharacteristics ();
+    }
+
+    public void SettingTypeCharacteristics () {
+        switch (this.type) {
+            case creatureAttackType.Tank:
+            break;
+            case creatureAttackType.LowRange:
+            break;
+            case creatureAttackType.HighRange:
+                ShotHighRangeProperties ();
+            break;
+            default:
+            break;
+        }
     }
 
     //Muda o nome do game object pro nome da criatura
@@ -61,7 +77,7 @@ public class CharactersManager : MechanicsManager {
 
         //Se o raycast achou um collider e este objeto tá atacando, ele diz quem ataca e muda a cor da linha
         if (rc.collider != null && Attacking()) {
-            print (rc.collider.GetComponent<CharactersManager> ().name + " foi atacado por " + this.name);
+            print (rc.collider.GetComponent<CharactersManager> ().name + " atacou " + this.name);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
             //Esse cara ataca
         }
@@ -91,7 +107,12 @@ public class CharactersManager : MechanicsManager {
         }
 
         //The raycast position and direction will change according to it's size and if it's an organel or virus
-        raycastPos.position = new Vector2 ((this.transform.position.x + creatureAttackRange) * (int)dir, this.transform.position.y);
+        if (this.goodOrEvil == GoodOrEvil.organel) {
+            raycastPos.position = new Vector2 (this.transform.position.x + creatureAttackRange, this.transform.position.y);
+        }
+        else {
+            raycastPos.position = new Vector2 (this.transform.position.x - creatureAttackRange, this.transform.position.y);
+        }
     }
 
     //Attacking method. Returns true if it's attacking
@@ -102,27 +123,34 @@ public class CharactersManager : MechanicsManager {
             print (rc.collider.GetComponent<CharactersManager> ().name + " tem " + rc.collider.GetComponent<CharactersManager> ().creatureLife + " de vida");
             //this variable tells if this character moves or not after attack
             this.isAttacking = true;
+            if (this.type == creatureAttackType.LowRange) {
+                //Aqui a gente passa a condição de chamar a animação de lowRange
+            }
+            else if (this.type == creatureAttackType.HighRange) {
+                //Aqui a gente passa a condição de chamar a animação de HighRange
+            }
             //Call Animation - Each different character calls a Different attack in the animation
             return true;
         }
         else {
             //false so it's no longer attacking
+            this.isAttacking = false;
             return false;
         }
     }
 
     //BeingAttacking method. Returns true if it's being attacked
     public bool BeingAttacked () {
-        if (rc.collider.GetComponent<CharactersManager>().creatureIniciative >= this.creatureIniciative) {
+        if (rc.collider.GetComponent<CharactersManager>().creatureIniciative > this.creatureIniciative) {
             //this variavle will help in the animations, if not, just delete it
             this.beingAttacked = true;
-            //Pushes back the guy whos being attacked 
-            PushedBack ();
             //Call Animation
+            PushedBack ();
             return true;
         }
         else {
             //false so it's no longer being attacked
+            this.beingAttacked = false;
             return false;
         }
     }
@@ -130,7 +158,7 @@ public class CharactersManager : MechanicsManager {
     //If the pushes back force it's different than 0, it pushes it back 
     public void PushedBack () {
         if (pushedBackForce != 0) {
-            transform.Translate (Vector2.right * pushedBackForce / 2f * (int)dir * -1f);
+            transform.Translate (Vector2.right * pushedBackForce / 2f * (int)this.dir * -1f);
         }
     }
 
@@ -143,6 +171,15 @@ public class CharactersManager : MechanicsManager {
 
     public void HighRangeAttack () {
         //instantiate the projectiles - After they collide, subtract life; Animation;
+        Instantiate (shot, this.gameObject.transform.position, Quaternion.identity);
+
+    }
+
+    public void ShotHighRangeProperties () {
+        shot.gameObject.GetComponent<ShotsManager> ().shotSpeed = this.shotSpeed;
+        shot.gameObject.GetComponent<ShotsManager> ().shotAttack = this.creatureAttack;
+        shot.gameObject.GetComponent<ShotsManager> ().shotDir = this.dir;
+        shot.gameObject.GetComponent<ShotsManager> ().endingPos = this.endingPos;
     }
 
     void Update () {
@@ -150,6 +187,11 @@ public class CharactersManager : MechanicsManager {
         Movement ();
         //Checks rayCast
         RayCastingMethod ();
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            Instantiate (shot, this.gameObject.transform.position, Quaternion.identity); 
+
+        }
     }
 
     //If this caracter is an organel, he's gonna have different properties than the virus. The direction they move it's an example
@@ -162,14 +204,14 @@ public class CharactersManager : MechanicsManager {
                 this.dir = direction.left;
             break;
         }
-        raycastPos.position = new Vector2 (1 * (int)dir, this.transform.position.y);
+       raycastPos.position = new Vector2 (raycastPos.position.x *(int)this.dir, this.transform.position.y);
 
     }
 
     //Tell them to move if they're not attacking
     public void Movement () {
-        if (!isAttacking || !beingAttacked) {
-            transform.Translate (Vector2.right * creatureSpeed/10f * (int) dir);
+        if (this.isAttacking == false || this.beingAttacked) {
+            transform.Translate (Vector2.right * creatureSpeed/10f * (int) this.dir);
         }
     }
 
