@@ -19,13 +19,12 @@ public class CharactersManager : MechanicsManager {
     public direction dir;
     public GoodOrEvil goodOrEvil;
     public creatureAttackType type;
-    public Vector2 startingPos, endingPos;
 
     public bool isAttacking, beingAttacked, move;
     public int creatureCost, creatureLife, creatureAttack, creatureIniciative, creatureAttackRange;
     public float creatureSpeed, pushedBackForce, shotSpeed;
 
-    void Start () {
+    void Awake () {
         //pega o transform do objeto filho
         raycastPos = this.gameObject.transform.GetChild (0);
         SettingName ();
@@ -176,15 +175,14 @@ public class CharactersManager : MechanicsManager {
         shot.gameObject.GetComponent<ShotsManager> ().shotSpeed = this.shotSpeed;
         shot.gameObject.GetComponent<ShotsManager> ().shotAttack = this.creatureAttack;
         shot.gameObject.GetComponent<ShotsManager> ().shotDir = this.dir;
-        shot.gameObject.GetComponent<ShotsManager> ().endingPos = this.endingPos;
     }
 
-    void Update () {
+    void FixedUpdate () {
         //Makes them move
         Movement ();
         //Checks rayCast
         RayCastingMethod ();
-
+        DestroyCharacter ();
     }
 
     //If this caracter is an organel, he's gonna have different properties than the virus. The direction they move it's an example
@@ -201,10 +199,24 @@ public class CharactersManager : MechanicsManager {
 
     }
 
+    public void DestroyCharacter () {
+        if (this.creatureLife <= 0) {
+           Destroy (this.gameObject);
+        }
+        if (this.goodOrEvil == GoodOrEvil.organel && this.gameObject.transform.position.x > 56) {
+            PlayerManager.instance.life += this.creatureCost;
+            Destroy (this.gameObject);
+        }
+        else if (this.goodOrEvil == GoodOrEvil.virus && this.gameObject.transform.position.x < 56) {
+            EnemyManager.instance.life += this.creatureCost;
+            Destroy (this.gameObject);
+        }
+    }
+
     //Tell them to move if they're not attacking
     public void Movement () {
         if (move) {
-            transform.Translate (Vector2.right * creatureSpeed / 10f * (int)this.dir);
+            transform.Translate (Vector2.right * creatureSpeed * .01f * (int)this.dir);
         }
     }
 

@@ -34,5 +34,6 @@ public class CharactersManagerEditor : Editor {
             break;
         }
 
+        EditorUtility.SetDirty (target);
     }
 }
