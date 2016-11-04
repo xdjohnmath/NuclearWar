@@ -3,7 +3,6 @@ using System.Collections;
 
 public class EnemyManager : MechanicsManager {
 
-    public int[] yPos = new int[4];
 
     //Singleton
     public static EnemyManager instance = null;

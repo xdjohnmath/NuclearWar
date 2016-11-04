@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-
 //O Script tá comentado em ingles e portugues... I'm not even sorry ;) That's how I roll.. Get uset to it
 //Enums
 public enum creatureAttackType { Tank, LowRange, HighRange };
@@ -26,10 +25,45 @@ public class CharactersManager : MechanicsManager {
 
     void Awake () {
         //pega o transform do objeto filho
-        raycastPos = this.gameObject.transform.GetChild (0);
-        SettingName ();
-        SettingGoodOrEvilType ();
-        SettingTypeCharacteristics ();
+        try {
+            isAttacking = false;
+            raycastPos = this.gameObject.transform.GetChild (0);
+            SettingName ();
+            SettingGoodOrEvilType ();
+            SettingGoodOrEvilPositions ();
+            SettingTypeCharacteristics ();
+            RandomizingValuesOffset ();
+
+        }
+        catch (System.Exception e){
+            Debug.LogException (e, this);
+        }
+
+    }
+
+    public void SettingGoodOrEvilPositions () {
+        if (this.goodOrEvil == GoodOrEvil.organel) {
+            this.startingPos = 89;
+            this.endingPos = this.startingPos * -1;
+            this.transform.position = new Vector2 (this.startingPos, this.transform.position.y);
+            this.transform.position = new Vector2 (this.endingPos, this.transform.position.y);
+        }
+        else {
+            this.startingPos = -89;
+            this.endingPos = this.startingPos * -1;
+            this.transform.position = new Vector2 (this.startingPos, this.transform.position.y);
+            this.transform.position = new Vector2 (this.endingPos, this.transform.position.y);
+        }
+    }
+
+    public void RandomizingValuesOffset () {
+        this.creatureAttack = Random.Range ((int)(this.creatureAttack / 2f + 1), this.creatureAttack + 1);
+        this.creatureIniciative = Random.Range ((int)(this.creatureIniciative / 2f + 1), this.creatureIniciative + 1);
+        this.creatureLife = Random.Range ((int)(this.creatureLife / 2f + 1), this.creatureLife + 1);
+        this.creatureSpeed = Random.Range (this.creatureSpeed / 2f + 1, this.creatureSpeed + 1);
+        this.pushedBackForce = Random.Range (this.pushedBackForce / 2f + 1, this.pushedBackForce + 1);
+        this.shotSpeed = Random.Range (this.shotSpeed / 2f + 1, this.shotSpeed + 1);
+
     }
 
     public void SettingTypeCharacteristics () {
@@ -69,6 +103,11 @@ public class CharactersManager : MechanicsManager {
         if (rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
             move = true;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
+        }
+
+        if (rc.collider != null && this.goodOrEvil == rc.collider.GetComponent<CharactersManager>().goodOrEvil) {
+            move = true;
+            Debug.DrawLine (this.transform.position, raycastPos.position, Color.cyan);
         }
 
         //Se o raycast achou um collider e este objeto tá atacando, ele diz quem ataca e muda a cor da linha
@@ -177,7 +216,7 @@ public class CharactersManager : MechanicsManager {
         shot.gameObject.GetComponent<ShotsManager> ().shotDir = this.dir;
     }
 
-    void FixedUpdate () {
+    void Update () {
         //Makes them move
         Movement ();
         //Checks rayCast
@@ -203,11 +242,11 @@ public class CharactersManager : MechanicsManager {
         if (this.creatureLife <= 0) {
            Destroy (this.gameObject);
         }
-        if (this.goodOrEvil == GoodOrEvil.organel && this.gameObject.transform.position.x > 56) {
+        if (this.goodOrEvil == GoodOrEvil.organel && this.gameObject.transform.position.x > 89) {
             PlayerManager.instance.life += this.creatureCost;
             Destroy (this.gameObject);
         }
-        else if (this.goodOrEvil == GoodOrEvil.virus && this.gameObject.transform.position.x < 56) {
+        else if (this.goodOrEvil == GoodOrEvil.virus && this.gameObject.transform.position.x < -89) {
             EnemyManager.instance.life += this.creatureCost;
             Destroy (this.gameObject);
         }
