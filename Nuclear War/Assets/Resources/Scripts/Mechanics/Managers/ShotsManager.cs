@@ -10,7 +10,7 @@ public class ShotsManager : MonoBehaviour {
 	void Update () {
         transform.Translate (Vector2.right *shotSpeed *Time.deltaTime *(int)shotDir);
 
-        if (this.transform.position.x > 56 || this.transform.position.y < -56) {
+        if (this.transform.position.x > PlayerManager.instance.startingPos || this.transform.position.y < PlayerManager.instance.endingPos) {
             Destroy (this.gameObject);
         }
        
