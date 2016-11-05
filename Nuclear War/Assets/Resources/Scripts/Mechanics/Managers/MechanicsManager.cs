@@ -32,7 +32,7 @@ public class MechanicsManager : MonoBehaviour {
 
     public void CheckingEnergyToButtons (Button[] b) {
         for (int i = 0; i < prefabsArray.Length; i++) {
-            if (prefabsArray[i].GetComponent<CharactersManager> ().creatureCost > this.energy) {
+            if (prefabsArray[i].GetComponentInChildren<CharactersManager> ().creatureCost > this.energy) {
                 b[i].interactable = false;
             }
             else {

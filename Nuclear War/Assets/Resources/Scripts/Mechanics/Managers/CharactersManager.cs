@@ -15,6 +15,7 @@ public class CharactersManager : MechanicsManager {
     RaycastHit2D rc;
     public GameObject shot;
 
+    public Sprite buttonSprite;
     Animator anim;
 
     public direction dir;
@@ -44,18 +45,22 @@ public class CharactersManager : MechanicsManager {
 
     }
 
+    public void ResettingThisPosition () {
+        this.transform.position = new Vector2 (this.startingPos, 0);
+    }
+
     public void SettingGoodOrEvilPositions () {
         if (this.goodOrEvil == GoodOrEvil.organel) {
             this.startingPos = 89;
             this.endingPos = this.startingPos * -1;
-            this.transform.position = new Vector2 (this.startingPos, this.transform.position.y);
-            this.transform.position = new Vector2 (this.endingPos, this.transform.position.y);
+            this.transform.position = new Vector2 (this.startingPos, this.GetComponentInParent<Transform>().position.y);
+            this.transform.position = new Vector2 (this.endingPos, this.GetComponentInParent<Transform> ().position.y);
         }
         else {
             this.startingPos = -89;
             this.endingPos = this.startingPos * -1;
-            this.transform.position = new Vector2 (this.startingPos, this.transform.position.y);
-            this.transform.position = new Vector2 (this.endingPos, this.transform.position.y);
+            this.transform.position = new Vector2 (this.startingPos, this.GetComponentInParent<Transform> ().position.y);
+            this.transform.position = new Vector2 (this.endingPos, this.GetComponentInParent<Transform> ().position.y);
         }
     }
 
@@ -86,6 +91,7 @@ public class CharactersManager : MechanicsManager {
     //Muda o nome do game object pro nome da criatura
     public void SettingName () {
         creatureName = this.name;
+        gameObject.GetComponentInParent<Transform> ().name = this.name;
     }
 
     //Detecta as colisões e se deve atacar ou ser atacado

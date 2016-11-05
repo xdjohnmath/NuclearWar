@@ -35,7 +35,7 @@ public class EnemyManager : MechanicsManager {
         instance.prefabsArray = new GameObject[prefabs.Length];
         for (int i = 0; i < prefabs.Count (); i++) {
             instance.prefabsArray[i] = prefabs[i];
-            if (instance.prefabsArray[i].GetComponent<CharactersManager>().creatureCost < instance.energy) {
+            if (instance.prefabsArray[i].GetComponentInChildren<CharactersManager>().creatureCost < instance.energy) {
                 counter++;
             }
         }
@@ -43,7 +43,7 @@ public class EnemyManager : MechanicsManager {
         GameObject[] placeholder = new GameObject[counter];
 
         for (int i = 0; i < instance.prefabsArray.Length; i++) {
-            if (instance.prefabsArray[i].GetComponent<CharactersManager>().creatureCost < instance.energy) {
+            if (instance.prefabsArray[i].GetComponentInChildren<CharactersManager>().creatureCost < instance.energy) {
                 placeholder[i] = instance.prefabsArray[i];
             }
         }
@@ -51,7 +51,7 @@ public class EnemyManager : MechanicsManager {
         if (counter > 1) {
             instance.selectedCharacter = placeholder[Random.Range (0, counter - 1)];
             SelectingStartingPosition ();
-            instance.energy -= selectedCharacter.GetComponent<CharactersManager> ().creatureCost;
+            instance.energy -= selectedCharacter.GetComponentInChildren<CharactersManager> ().creatureCost;
         }
 
 

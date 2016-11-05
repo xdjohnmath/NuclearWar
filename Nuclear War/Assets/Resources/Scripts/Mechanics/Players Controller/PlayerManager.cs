@@ -10,7 +10,7 @@ public class PlayerManager : MechanicsManager {
     public static PlayerManager instance = null;
     public Text energyText;
     public Button[] organelas, lines;
-    GameObject linesGameObject, disableLines;
+    GameObject linesGameObject;
 
     void Awake () {
 
@@ -37,8 +37,9 @@ public class PlayerManager : MechanicsManager {
         instance.prefabsArray = new GameObject[prefabs.Length];
         for (int i = 0; i < prefabs.Count (); i++) {
             instance.prefabsArray[i] = prefabs[i];
-            b[i].name = prefabs[i].name;
-            b[i].GetComponent<Image> ().sprite = prefabs[i].GetComponent<SpriteRenderer> ().sprite;
+            b[i].name = prefabs[i].name;            
+            b[i].GetComponent<Image> ().sprite = prefabs[i].GetComponentInChildren<CharactersManager>().buttonSprite;
+            prefabs[i].GetComponentInChildren<CharactersManager> ().ResettingThisPosition ();
         }
 
         //Disabling non used buttons
@@ -64,9 +65,8 @@ public class PlayerManager : MechanicsManager {
         base.SelectingStartingPosition ();
         for (int i = 0; i < lines.Length; i++) {
             if (EventSystem.current.currentSelectedGameObject.name == lines[i].name) {
-                
                 Instantiate (instance.selectedCharacter, new Vector3(instance.startingPos, instance.yPosition[i], selectedCharacter.transform.position.z), Quaternion.identity);
-                instance.energy -= instance.selectedCharacter.GetComponent<CharactersManager> ().creatureCost;
+                instance.energy -= instance.selectedCharacter.GetComponentInChildren<CharactersManager> ().creatureCost;
             }
 
         }
