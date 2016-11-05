@@ -14,6 +14,7 @@ public class MechanicsManager : MonoBehaviour {
     public float startingPos { get; set; }
     public float endingPos { get; set;}
     public GameObject selectedCharacter { get; set; }
+    [HideInInspector]
     public int[] yPosition = new int[] { 39, 23, 7, -9, -25 };
 
     //value to be added and how long you must wait

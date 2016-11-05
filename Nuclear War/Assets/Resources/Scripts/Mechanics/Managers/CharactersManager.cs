@@ -15,6 +15,8 @@ public class CharactersManager : MechanicsManager {
     RaycastHit2D rc;
     public GameObject shot;
 
+    Animator anim;
+
     public direction dir;
     public GoodOrEvil goodOrEvil;
     public creatureAttackType type;
@@ -26,6 +28,7 @@ public class CharactersManager : MechanicsManager {
     void Awake () {
         //pega o transform do objeto filho
         try {
+            anim = GetComponent<Animator> ();
             isAttacking = false;
             raycastPos = this.gameObject.transform.GetChild (0);
             SettingName ();
