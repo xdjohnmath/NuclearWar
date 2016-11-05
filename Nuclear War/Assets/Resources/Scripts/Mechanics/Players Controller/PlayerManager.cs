@@ -10,7 +10,7 @@ public class PlayerManager : MechanicsManager {
     public static PlayerManager instance = null;
     public Text energyText;
     public Button[] organelas, lines;
-    GameObject selectedCharacter, linesGameObject, disableLines;
+    GameObject linesGameObject, disableLines;
 
     void Awake () {
 
@@ -27,14 +27,16 @@ public class PlayerManager : MechanicsManager {
         instance.energyTime = 1;
         linesGameObject = GameObject.Find ("Lines");
         linesGameObject.SetActive (false);
+
+
     }
 
     public void SettingButtons (Button[] b) {
         //Setting buttons to the right organels
         var prefabs = Resources.LoadAll ("Prefabs/Organelas", typeof (GameObject)).Cast<GameObject> ().ToArray ();
-        prefabsArray = new GameObject[prefabs.Length];
+        instance.prefabsArray = new GameObject[prefabs.Length];
         for (int i = 0; i < prefabs.Count (); i++) {
-            prefabsArray[i] = prefabs[i];
+            instance.prefabsArray[i] = prefabs[i];
             b[i].name = prefabs[i].name;
             b[i].GetComponent<Image> ().sprite = prefabs[i].GetComponent<SpriteRenderer> ().sprite;
         }
@@ -50,10 +52,10 @@ public class PlayerManager : MechanicsManager {
 
     public override void SelectingCharacter () {
         base.SelectingCharacter ();
-        for (int i = 0; i < prefabsArray.Length; i++) {
-            if (EventSystem.current.currentSelectedGameObject.name == prefabsArray[i].name) {
+        for (int i = 0; i < instance.prefabsArray.Length; i++) {
+            if (EventSystem.current.currentSelectedGameObject.name == instance.prefabsArray[i].name) {
                 linesGameObject.SetActive(true);
-                selectedCharacter = prefabsArray[i];
+                instance.selectedCharacter = instance.prefabsArray[i];
             }
         }
     }
@@ -62,8 +64,9 @@ public class PlayerManager : MechanicsManager {
         base.SelectingStartingPosition ();
         for (int i = 0; i < lines.Length; i++) {
             if (EventSystem.current.currentSelectedGameObject.name == lines[i].name) {
-                Instantiate (selectedCharacter, new Vector3(-89f, yPos[i], selectedCharacter.transform.position.z), Quaternion.identity);
-                instance.energy -= selectedCharacter.GetComponent<CharactersManager> ().creatureCost;
+                
+                Instantiate (instance.selectedCharacter, new Vector3(instance.startingPos, instance.yPosition[i], selectedCharacter.transform.position.z), Quaternion.identity);
+                instance.energy -= instance.selectedCharacter.GetComponent<CharactersManager> ().creatureCost;
             }
 
         }
