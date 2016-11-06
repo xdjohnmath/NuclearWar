@@ -46,7 +46,7 @@ public class CharactersManager : MechanicsManager {
     }
 
     public void ResettingThisPosition () {
-        this.transform.position = new Vector2 (this.startingPos, 0);
+        this.transform.localPosition = new Vector2 (this.startingPos, this.gameObject.transform.localPosition.y);
     }
 
     public void SettingGoodOrEvilPositions () {
