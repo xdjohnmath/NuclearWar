@@ -5,7 +5,12 @@ public class ShotsManager : MonoBehaviour {
 
     public float shotSpeed;
     public int shotAttack;
+    public GoodOrEvil type;
     public direction shotDir;
+
+    void Start () {
+        print ("hey");
+    }
 
 	void Update () {
         transform.Translate (Vector2.right *shotSpeed *Time.deltaTime *(int)shotDir);
@@ -17,9 +22,9 @@ public class ShotsManager : MonoBehaviour {
 	}
 
     void OnCollisionEnter2D (Collision2D other) {
-        if (other.gameObject.GetComponent<CharactersManager> ().goodOrEvil == GoodOrEvil.virus) {
-            other.gameObject.GetComponent<CharactersManager> ().creatureLife -= shotAttack;
-            Destroy (this.gameObject);
+        if (other.gameObject.GetComponentInChildren<CharactersManager> ().goodOrEvil != this.type) {
+            other.gameObject.GetComponentInChildren<CharactersManager> ().creatureLife -= shotAttack;
+            //Destroy (this.gameObject);
         }
     }
 }

@@ -16,7 +16,6 @@ public class CharactersManager : MechanicsManager {
     public GameObject shot;
 
     public Sprite buttonSprite;
-    Animator anim;
 
     public direction dir;
     public GoodOrEvil goodOrEvil;
@@ -29,8 +28,10 @@ public class CharactersManager : MechanicsManager {
     void Awake () {
         //pega o transform do objeto filho
         try {
-            anim = GetComponent<Animator> ();
             isAttacking = false;
+            if (this.gameObject.transform.parent.GetComponentInParent<CallEventAnimation>() == null) {
+                this.gameObject.transform.parent.gameObject.AddComponent<CallEventAnimation> ();
+            }
             raycastPos = this.gameObject.transform.GetChild (0);
             SettingName ();
             SettingGoodOrEvilType ();
@@ -101,29 +102,27 @@ public class CharactersManager : MechanicsManager {
         SettingRayCastSize ();
 
         //Ele cria uma linha imaginária que pode detectar collider e que começa no centro do objeto e vai até o raycastPos. (que é o objeto vazio filho do character)
-        rc = Physics2D.Linecast (transform.position, raycastPos.position);
+        this.rc = Physics2D.Linecast (transform.position, raycastPos.position);
 
         //Se for organela e o raycast não tiver pegando em nada, fica azul
-        if (rc.collider == null && this.goodOrEvil == GoodOrEvil.organel) {
-            move = true;
+        if (this.rc.collider == null && this.goodOrEvil == GoodOrEvil.organel) {
+            this.move = true;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
-        if (rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
-            move = true;
+        if (this.rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
+            this.move = true;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
-        if (rc.collider != null && this.goodOrEvil == rc.collider.GetComponent<CharactersManager>().goodOrEvil) {
-            move = true;
+        if (this.rc.collider != null && this.goodOrEvil == this.rc.collider.GetComponent<CharactersManager>().goodOrEvil) {
+            this.move = true;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.cyan);
         }
 
         //Se o raycast achou um collider e este objeto tá atacando, ele diz quem ataca e muda a cor da linha
-        if (rc.collider != null && this.goodOrEvil != rc.collider.GetComponent<CharactersManager> ().goodOrEvil) {
+        if (this.rc.collider != null && this.goodOrEvil != this.rc.collider.GetComponent<CharactersManager> ().goodOrEvil) {
             Attacking ();
-            rc.collider.GetComponent<CharactersManager> ().BeingAttacked ();
-            print (rc.collider.GetComponent<CharactersManager> ().name + " atacou " + this.name);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
             //Esse cara ataca
         }
@@ -157,9 +156,10 @@ public class CharactersManager : MechanicsManager {
 
     //Attacking method. Returns true if it's attacking
     public void Attacking () {
-        move = false;
-        switch (this.type) {
-            case creatureAttackType.LowRange:
+        if (this.rc.collider != null && rc.collider.gameObject.GetComponent<CharactersManager>().rc.collider != null) {
+            move = false;
+            switch (this.type) {
+                case creatureAttackType.LowRange:
                 if (this.creatureIniciative > rc.collider.GetComponent<CharactersManager> ().creatureIniciative) {
                     this.isAttacking = true;
                     rc.collider.GetComponent<CharactersManager> ().beingAttacked = true;
@@ -172,11 +172,16 @@ public class CharactersManager : MechanicsManager {
                     this.beingAttacked = true;
                     rc.collider.GetComponent<CharactersManager> ().isAttacking = true;
                 }
-            break;
-            case creatureAttackType.HighRange:
+                break;
+                case creatureAttackType.HighRange:
                 this.isAttacking = true;
                 rc.collider.GetComponent<CharactersManager> ().beingAttacked = true;
-            break;
+                break;
+            }
+        }
+        else if (rc.collider != null) {
+            this.isAttacking = true;
+            print (this.name);
         }
     }
 
@@ -204,9 +209,9 @@ public class CharactersManager : MechanicsManager {
 
     //If it's low range, when the animation hits the enemy it decreases the enemy's life in this creature's attack
     public void LowRangeAttack () {
-        rc.collider.GetComponent<CharactersManager> ().creatureLife -= this.creatureAttack;
+        rc.collider.GetComponentInChildren<CharactersManager> ().creatureLife -= this.creatureAttack;
         print (rc.collider.GetComponent<CharactersManager> ().creatureLife);
-
+        rc.collider.GetComponentInChildren<CharactersManager> ().PushedBack ();
     }
 
     public void HighRangeAttack () {
@@ -223,6 +228,7 @@ public class CharactersManager : MechanicsManager {
         shot.gameObject.GetComponent<ShotsManager> ().shotSpeed = this.shotSpeed;
         shot.gameObject.GetComponent<ShotsManager> ().shotAttack = this.creatureAttack;
         shot.gameObject.GetComponent<ShotsManager> ().shotDir = this.dir;
+        shot.gameObject.GetComponent<ShotsManager> ().type = this.goodOrEvil;
     }
 
     void Update () {
@@ -248,9 +254,7 @@ public class CharactersManager : MechanicsManager {
     }
 
     public void DestroyCharacter () {
-        if (this.creatureLife <= 0) {
-           Destroy (this.gameObject);
-        }
+
         if (this.goodOrEvil == GoodOrEvil.organel && this.gameObject.transform.position.x > 89) {
             PlayerManager.instance.life += this.creatureCost;
             Destroy (this.gameObject);
