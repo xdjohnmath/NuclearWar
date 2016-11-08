@@ -107,22 +107,30 @@ public class CharactersManager : MechanicsManager {
         //Se for organela e o raycast não tiver pegando em nada, fica azul
         if (this.rc.collider == null && this.goodOrEvil == GoodOrEvil.organel) {
             this.move = true;
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", true);
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", false);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
         if (this.rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
             this.move = true;
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", true);
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", false);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
         if (this.rc.collider != null && this.goodOrEvil == this.rc.collider.GetComponent<CharactersManager>().goodOrEvil) {
             this.move = true;
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", true);
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", false);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.cyan);
         }
 
         //Se o raycast achou um collider e este objeto tá atacando, ele diz quem ataca e muda a cor da linha
         if (this.rc.collider != null && this.goodOrEvil != this.rc.collider.GetComponent<CharactersManager> ().goodOrEvil) {
             Attacking ();
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", false);
+            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", true);
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
             //Esse cara ataca
         }

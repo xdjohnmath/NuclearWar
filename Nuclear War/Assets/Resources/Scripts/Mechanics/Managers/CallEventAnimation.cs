@@ -8,6 +8,7 @@ public class CallEventAnimation : MonoBehaviour {
     void Start () {
         anim = GetComponent<Animator> ();
         anim.SetInteger ("life", gameObject.GetComponentInChildren<CharactersManager> ().creatureLife);
+        anim.SetBool ("shot", false);
     }
 
     void Update () {
@@ -15,6 +16,10 @@ public class CallEventAnimation : MonoBehaviour {
         if (gameObject.GetComponentInChildren<CharactersManager> ().creatureLife <= 0) {
             print ("EU USO ÓCULOS");
             anim.SetInteger ("life", 0);
+        }
+
+        if (this.gameObject.GetComponentInChildren<CharactersManager>().move == true) {
+            anim.SetBool ("move", true);
         }
 
         switch (gameObject.GetComponentInChildren<CharactersManager>().type) {
@@ -59,10 +64,18 @@ public class CallEventAnimation : MonoBehaviour {
         Destroy (gameObject);
     }
 
-    public void ResetAnimation () {
+    public void ResetAnimationLowRange () {
         anim.SetBool ("isAttacking", false);
         anim.SetBool ("move", true);
         anim.SetBool ("beingAttacked", false);
+        anim.SetBool ("shot", false);
+        gameObject.GetComponentInChildren<CharactersManager> ().move = true;
+    }
+
+    public void ResetAnimationHighRange () {
+        anim.SetBool ("isAttacking", false);
+        anim.SetBool ("beingAttacked", false);
+        anim.SetBool ("shot", false);
         gameObject.GetComponentInChildren<CharactersManager> ().move = true;
     }
 
@@ -73,5 +86,6 @@ public class CallEventAnimation : MonoBehaviour {
 
     public void HighRange () {
         gameObject.GetComponentInChildren<CharactersManager> ().HighRangeAttack ();
+        anim.SetBool ("shot", true);
     }
 }
