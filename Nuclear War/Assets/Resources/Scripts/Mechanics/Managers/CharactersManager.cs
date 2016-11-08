@@ -181,7 +181,6 @@ public class CharactersManager : MechanicsManager {
         }
         else if (rc.collider != null) {
             this.isAttacking = true;
-            print (this.name);
         }
     }
 
@@ -210,7 +209,6 @@ public class CharactersManager : MechanicsManager {
     //If it's low range, when the animation hits the enemy it decreases the enemy's life in this creature's attack
     public void LowRangeAttack () {
         rc.collider.GetComponentInChildren<CharactersManager> ().creatureLife -= this.creatureAttack;
-        print (rc.collider.GetComponent<CharactersManager> ().creatureLife);
         rc.collider.GetComponentInChildren<CharactersManager> ().PushedBack ();
     }
 
@@ -244,9 +242,11 @@ public class CharactersManager : MechanicsManager {
         switch (goodOrEvil) {
             case GoodOrEvil.organel:
                 this.dir = direction.right;
+                this.gameObject.tag = "Organel";
             break;
             case GoodOrEvil.virus:
                 this.dir = direction.left;
+                this.gameObject.tag = "Virus";
             break;
         }
        raycastPos.position = new Vector2 (raycastPos.position.x *(int)this.dir, this.transform.position.y);
