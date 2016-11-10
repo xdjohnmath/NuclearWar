@@ -5,15 +5,16 @@ public class CallEventAnimation : MonoBehaviour {
 
     Animator anim;
 
-    void Start () {
+    void Awake () {
         anim = GetComponent<Animator> ();
         anim.SetInteger ("life", gameObject.GetComponentInChildren<CharactersManager> ().creatureLife);
         anim.SetBool ("shot", false);
+        anim.SetBool ("spawned", false);
     }
 
     void Update () {
 
-        if (gameObject.GetComponentInChildren<CharactersManager> ().creatureLife <= 0) {
+        if (this.gameObject.GetComponentInChildren<CharactersManager> ().creatureLife <= 0) {
             print ("EU USO ÓCULOS");
             anim.SetInteger ("life", 0);
         }
@@ -77,6 +78,14 @@ public class CallEventAnimation : MonoBehaviour {
         anim.SetBool ("beingAttacked", false);
         anim.SetBool ("shot", false);
         gameObject.GetComponentInChildren<CharactersManager> ().move = true;
+    }
+
+    public void ResetMove () {
+        if (anim.GetComponentInChildren<CharactersManager> ().move == false) {
+            anim.GetComponentInChildren<CharactersManager> ().move = true;
+            
+        }
+        print ("O MOVE É " + anim.GetComponentInChildren<CharactersManager> ().move);
     }
 
     public void LowRange () {

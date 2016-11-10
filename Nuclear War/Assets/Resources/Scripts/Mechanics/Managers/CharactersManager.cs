@@ -107,30 +107,27 @@ public class CharactersManager : MechanicsManager {
         //Se for organela e o raycast não tiver pegando em nada, fica azul
         if (this.rc.collider == null && this.goodOrEvil == GoodOrEvil.organel) {
             this.move = true;
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", true);
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", false);
+            this.isAttacking = false;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
         if (this.rc.collider == null && this.goodOrEvil == GoodOrEvil.virus) {
             this.move = true;
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", true);
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", false);
+            this.isAttacking = false;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.blue);
         }
 
         if (this.rc.collider != null && this.goodOrEvil == this.rc.collider.GetComponent<CharactersManager>().goodOrEvil) {
             this.move = true;
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", true);
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", false);
+            this.isAttacking = false;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.cyan);
         }
 
         //Se o raycast achou um collider e este objeto tá atacando, ele diz quem ataca e muda a cor da linha
         if (this.rc.collider != null && this.goodOrEvil != this.rc.collider.GetComponent<CharactersManager> ().goodOrEvil) {
             Attacking ();
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", false);
-            this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", true);
+            this.move = false;
+            this.isAttacking = true;
             Debug.DrawLine (this.transform.position, raycastPos.position, Color.red);
             //Esse cara ataca
         }
@@ -243,6 +240,9 @@ public class CharactersManager : MechanicsManager {
         //Checks rayCast
         RayCastingMethod ();
         DestroyCharacter ();
+
+        this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", this.move);
+        this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", this.isAttacking);
     }
 
     //If this caracter is an organel, he's gonna have different properties than the virus. The direction they move it's an example
@@ -275,7 +275,7 @@ public class CharactersManager : MechanicsManager {
 
     //Tell them to move if they're not attacking
     public void Movement () {
-        if (move) {
+        if (move == true) {
             transform.Translate (Vector2.right * creatureSpeed * .01f * (int)this.dir);
         }
     }
