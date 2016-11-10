@@ -14,49 +14,15 @@ public class CallEventAnimation : MonoBehaviour {
 
     void Update () {
 
-        if (this.gameObject.GetComponentInChildren<CharactersManager> ().creatureLife <= 0) {
-            print ("EU USO ÓCULOS");
-            anim.SetInteger ("life", 0);
-        }
-
-        if (this.gameObject.GetComponentInChildren<CharactersManager>().move == true) {
-            anim.SetBool ("move", true);
-        }
-
         switch (gameObject.GetComponentInChildren<CharactersManager>().type) {
             case creatureAttackType.Tank:
                 anim.SetInteger ("type", 2);
-                if (gameObject.GetComponentInChildren<CharactersManager> ().isAttacking == true) {
-                    anim.SetBool ("move", false);
-                    anim.SetBool ("isAttacking", true);
-                }
-                else if (gameObject.GetComponentInChildren<CharactersManager> ().beingAttacked == true) {
-                    anim.SetBool ("move", false);
-                    anim.SetBool ("beingAttacked", true);
-                }
             break;
             case creatureAttackType.LowRange:
                 anim.SetInteger ("type", 0);
-                if (gameObject.GetComponentInChildren<CharactersManager> ().isAttacking == true) {
-                    anim.SetBool ("move", false);
-                    anim.SetBool ("isAttacking", true);
-                }
-                else if (gameObject.GetComponentInChildren<CharactersManager>().beingAttacked == true) {
-                    anim.SetBool ("move", false);
-                    anim.SetBool ("beingAttacked", true);
-                }
             break;
             case creatureAttackType.HighRange:
                 anim.SetInteger ("type", 1);
-                if (gameObject.GetComponentInChildren<CharactersManager> ().isAttacking == true) {
-                    anim.SetBool ("move", false);
-                    anim.SetBool ("isAttacking", true);
-                    gameObject.GetComponentInChildren<CharactersManager> ().move = false;
-                }
-                else if (gameObject.GetComponentInChildren<CharactersManager> ().beingAttacked == true) {
-                    anim.SetBool ("move", false);
-                    anim.SetBool ("beingAttacked", true);
-                }
             break;
         }
     }
@@ -82,10 +48,8 @@ public class CallEventAnimation : MonoBehaviour {
 
     public void ResetMove () {
         if (anim.GetComponentInChildren<CharactersManager> ().move == false) {
-            anim.GetComponentInChildren<CharactersManager> ().move = true;
-            
+            anim.GetComponentInChildren<CharactersManager> ().move = true;         
         }
-        print ("O MOVE É " + anim.GetComponentInChildren<CharactersManager> ().move);
     }
 
     public void LowRange () {

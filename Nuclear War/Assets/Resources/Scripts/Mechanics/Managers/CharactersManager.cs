@@ -23,7 +23,7 @@ public class CharactersManager : MechanicsManager {
 
     public bool isAttacking, beingAttacked, move;
     public int creatureCost, creatureLife, creatureAttack, creatureIniciative, creatureAttackRange;
-    public float creatureSpeed, pushedBackForce, shotSpeed;
+    public float creatureSpeed, pushedBackForce, shotSpeed, yPos;
 
     void Awake () {
         //pega o transform do objeto filho
@@ -38,6 +38,7 @@ public class CharactersManager : MechanicsManager {
             SettingGoodOrEvilPositions ();
             SettingTypeCharacteristics ();
             RandomizingValuesOffset ();
+            yPos = PinningThemInTheYAxis ();
 
         }
         catch (System.Exception e){
@@ -213,8 +214,10 @@ public class CharactersManager : MechanicsManager {
 
     //If it's low range, when the animation hits the enemy it decreases the enemy's life in this creature's attack
     public void LowRangeAttack () {
-        rc.collider.GetComponentInChildren<CharactersManager> ().creatureLife -= this.creatureAttack;
-        rc.collider.GetComponentInChildren<CharactersManager> ().PushedBack ();
+        if (rc.collider != null) {
+            rc.collider.GetComponentInChildren<CharactersManager> ().creatureLife -= this.creatureAttack;
+            rc.collider.GetComponentInChildren<CharactersManager> ().PushedBack ();
+        }
     }
 
     public void HighRangeAttack () {
@@ -243,6 +246,7 @@ public class CharactersManager : MechanicsManager {
 
         this.gameObject.GetComponentInParent<Animator> ().SetBool ("move", this.move);
         this.gameObject.GetComponentInParent<Animator> ().SetBool ("isAttacking", this.isAttacking);
+        this.gameObject.GetComponentInParent<Animator> ().SetInteger ("life", this.creatureLife);
     }
 
     //If this caracter is an organel, he's gonna have different properties than the virus. The direction they move it's an example
@@ -262,7 +266,6 @@ public class CharactersManager : MechanicsManager {
     }
 
     public void DestroyCharacter () {
-
         if (this.goodOrEvil == GoodOrEvil.organel && this.gameObject.transform.position.x > 89) {
             PlayerManager.instance.life += this.creatureCost;
             Destroy (this.gameObject);
@@ -277,6 +280,12 @@ public class CharactersManager : MechanicsManager {
     public void Movement () {
         if (move == true) {
             transform.Translate (Vector2.right * creatureSpeed * .01f * (int)this.dir);
+        }
+        if (this.GetComponentInParent<Transform>().transform.position.y > yPos + 1) {
+            this.GetComponentInParent<Transform> ().transform.position = new Vector2 (this.GetComponentInParent<Transform> ().transform.position.x, this.GetComponentInParent<Transform> ().transform.position.y - 0.2f);
+        }
+        else if (this.GetComponentInParent<Transform> ().transform.position.y < yPos - 1) {
+            this.GetComponentInParent<Transform> ().transform.position = new Vector2 (this.GetComponentInParent<Transform> ().transform.position.x, this.GetComponentInParent<Transform> ().transform.position.y + 0.2f);
         }
     }
 

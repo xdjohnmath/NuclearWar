@@ -30,6 +30,16 @@ public class MechanicsManager : MonoBehaviour {
         }
     }
 
+    public float PinningThemInTheYAxis () {
+        float temp = 0;
+        for (int i = 0; i < yPosition.Length; i++) {
+            if (this.transform.position.y == yPosition[i]) {
+                temp = yPosition[i];
+            }
+        }
+        return temp;
+    }
+
     public void CheckingEnergyToButtons (Button[] b) {
         for (int i = 0; i < prefabsArray.Length; i++) {
             if (prefabsArray[i].GetComponentInChildren<CharactersManager> ().creatureCost > this.energy) {
