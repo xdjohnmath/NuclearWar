@@ -11,9 +11,11 @@ public class MechanicsManager : MonoBehaviour {
     public int energy { get; set; }
     public float energyTime { get; set; }
     public GameObject[] prefabsArray { get; set; }
-    public float[] yPos = new float[5] { 39, 23, 7, -9, -25 };
     public float startingPos { get; set; }
     public float endingPos { get; set;}
+    public GameObject selectedCharacter { get; set; }
+    [HideInInspector]
+    public int[] yPosition = new int[] { 39, 23, 7, -9, -25 };
 
     //value to be added and how long you must wait
     public int Energy (int value, float rate) {
@@ -30,7 +32,7 @@ public class MechanicsManager : MonoBehaviour {
 
     public void CheckingEnergyToButtons (Button[] b) {
         for (int i = 0; i < prefabsArray.Length; i++) {
-            if (prefabsArray[i].GetComponent<CharactersManager> ().creatureCost > this.energy) {
+            if (prefabsArray[i].GetComponentInChildren<CharactersManager> ().creatureCost > this.energy) {
                 b[i].interactable = false;
             }
             else {

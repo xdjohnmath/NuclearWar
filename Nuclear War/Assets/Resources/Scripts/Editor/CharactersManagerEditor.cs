@@ -8,6 +8,8 @@ public class CharactersManagerEditor : Editor {
 
     public override void OnInspectorGUI () {
 
+        bool allowSceneObjects = !EditorUtility.IsPersistent (target);
+
         CharactersManager cm = (CharactersManager) target;
         cm.name = EditorGUILayout.TextField ("Nome ", cm.name);
         cm.goodOrEvil = (GoodOrEvil) EditorGUILayout.EnumPopup ("Organela ou Virus ", cm.goodOrEvil);
@@ -18,6 +20,7 @@ public class CharactersManagerEditor : Editor {
         cm.creatureAttack = EditorGUILayout.IntField ("Ataque", cm.creatureAttack);
         cm.creatureIniciative = EditorGUILayout.IntField ("Iniciativa", cm.creatureIniciative);
         cm.creatureSpeed = EditorGUILayout.FloatField ("Velocidade", cm.creatureSpeed);
+        cm.buttonSprite = (Sprite)EditorGUILayout.ObjectField ("Sprite do botão ", cm.buttonSprite, typeof (Sprite), allowSceneObjects);
 
         switch (cm.type) {
             case creatureAttackType.Tank:
@@ -27,7 +30,6 @@ public class CharactersManagerEditor : Editor {
             break;
             case creatureAttackType.HighRange:
                 cm.shotSpeed = EditorGUILayout.FloatField ("Velocidade do Tiro ", cm.shotSpeed);
-                bool allowSceneObjects = !EditorUtility.IsPersistent (target);
                 cm.shot = (GameObject) EditorGUILayout.ObjectField ("Prefab do Tiro ", cm.shot, typeof (GameObject), allowSceneObjects);
             break;
             default:
