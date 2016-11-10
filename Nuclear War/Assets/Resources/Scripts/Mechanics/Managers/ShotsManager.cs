@@ -8,10 +8,6 @@ public class ShotsManager : MonoBehaviour {
     public GoodOrEvil type;
     public direction shotDir;
 
-    void Start () {
-        print ("hey");
-    }
-
 	void Update () {
         transform.Translate (Vector2.right *shotSpeed *Time.deltaTime *(int)shotDir);
        
@@ -19,8 +15,6 @@ public class ShotsManager : MonoBehaviour {
 
     void OnTriggerEnter2D (Collider2D other) {
         if (this.type == GoodOrEvil.organel && other.gameObject.tag != "Organel" || this.type == GoodOrEvil.virus && other.gameObject.tag != "Virus") {
-            print (this.type);
-            print (other.gameObject.tag);
             other.gameObject.GetComponentInChildren<CharactersManager> ().creatureLife -= shotAttack;
             Destroy (this.gameObject);
         }
