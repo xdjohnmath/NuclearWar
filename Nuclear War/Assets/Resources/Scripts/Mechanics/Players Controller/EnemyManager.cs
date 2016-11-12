@@ -5,6 +5,8 @@ using System.Linq;
 public class EnemyManager : MechanicsManager {
 
     public int energyRate;
+    public float waveRate;
+    float waveTime = 0;
 
     //Singleton
     public static EnemyManager instance = null;
@@ -24,6 +26,7 @@ public class EnemyManager : MechanicsManager {
 
     void Update () {
         instance.Energy (energyRate, 1);
+        WavesTimer (waveRate, 5);
         SelectingCharacter ();
 
     }
@@ -50,7 +53,7 @@ public class EnemyManager : MechanicsManager {
 
         if (counter > 1) {
             instance.selectedCharacter = placeholder[Random.Range (0, counter - 1)];
-            SelectingStartingPosition ();
+            StartCoroutine (DelayInstantiation (2));
             instance.energy -= selectedCharacter.GetComponentInChildren<CharactersManager> ().creatureCost;
         }
 
@@ -61,6 +64,27 @@ public class EnemyManager : MechanicsManager {
         base.SelectingStartingPosition ();
         
         Instantiate (instance.selectedCharacter, new Vector3 (instance.startingPos, instance.yPosition[(int)Random.Range(0, instance.yPosition.Length)], instance.selectedCharacter.transform.position.z), Quaternion.identity);
+    }
+ 
+    IEnumerator DelayInstantiation (float f) {
+        float a = Random.Range (0, 2);
+        yield return new WaitForSeconds (a);
+        SelectingStartingPosition ();
+
+    }
+
+    public float WavesTimer (float rate, int value) {
+        if (this.waveTime >= rate) {
+            this.energy *= value;
+            print ("WAAAAAAAAAAAAAAAAAAVE");
+            waveTime = 0;
+            return this.energy;
+        }
+        else {
+            this.waveTime += Time.deltaTime;
+            return this.energy;
+        }
+
     }
 
 }
